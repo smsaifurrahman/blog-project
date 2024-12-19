@@ -1,5 +1,7 @@
 import { model, Schema } from 'mongoose';
-import { IUser } from './user.interface';
+import { IUser, UserModel } from './user.interface';
+import bcrypt from 'bcrypt';
+import config from '../../config';
 
 const userSchema = new Schema<IUser>(
   {
@@ -10,9 +12,8 @@ const userSchema = new Schema<IUser>(
     },
     email: {
       type: String,
-      required:  [true, 'Email is required'],
+      required: [true, 'Email is required'],
       unique: true,
-   
     },
     password: {
       type: String,
@@ -33,5 +34,30 @@ const userSchema = new Schema<IUser>(
   },
 );
 
+userSchema.pre('save', async function (next) {
+  console.log(this, 'pre hook: we will save the data');
+  // hashing password and save into db
+  const user = this;
 
-export const User = model<IUser>('User', userSchema);
+  user.password = await bcrypt.hash(
+    user.password,
+    Number(config.bcrypt_salt_rounds),
+  );
+
+  next();
+});
+
+userSchema.statics.isUserExitsByEmail = async function (email: string) {
+  return await User.findOne({ email }).select('+password');
+};
+
+userSchema.statics.isUserBlocked = async function (isBlocked: boolean) {
+  return await User.findOne({ isBlocked });
+};
+
+userSchema.statics.isPasswordMatched = async function (  plainTextPassword,
+  hashedPassword,) {
+  return await bcrypt.compare(plainTextPassword, hashedPassword);
+};
+
+export const User = model<IUser, UserModel>('User', userSchema);
