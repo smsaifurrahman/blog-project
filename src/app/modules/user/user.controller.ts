@@ -2,7 +2,7 @@ import { RequestHandler } from 'express';
 import catchAsync from '../../utils/catchAsync';
 import { UserServices } from './user.service';
 import sendResponse from '../../utils/sendResponse';
-import { HttpStatus } from 'http-status-ts';
+import  {HttpStatus}  from 'http-status-ts';
 
 const createUser: RequestHandler = catchAsync(async (req, res, next) => {
   const userData = req.body;
@@ -10,10 +10,16 @@ const createUser: RequestHandler = catchAsync(async (req, res, next) => {
   const result = await UserServices.createUserIntoDB(userData);
 
   sendResponse(res, {
-    statusCode: HttpStatus.OK,
+    statusCode: 201,
     success: true,
-    message: 'User is created successfully',
-    data: result,
+    message: 'User registered successfully',
+    data: result
+    //  {
+    //   _id: result._id,
+    //   name: result.name,
+    //   email: result.email,
+
+    // },
   });
 });
 
