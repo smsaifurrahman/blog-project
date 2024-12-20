@@ -11,6 +11,8 @@ const router = express.Router();
 
 router.post('/', auth('user'), addAuthorInfo(), validateRequest(BlogValidations.createBlogValidationSchema), BlogControllers.createBlog);
 router.get('/', BlogControllers.getAllBlogs);
-router.patch('/:blogId', auth('user'), BlogControllers.updateBlog)
+router.patch('/:blogId', auth('user'), validateRequest(BlogValidations.updateBlogValidationSchema), BlogControllers.updateBlog);
+
+router.delete('/:blogId', auth('admin', 'user'), BlogControllers.deleteBlog );
 
 export const BlogRoutes = router

@@ -14,6 +14,12 @@ const updateBlogFromDB = async (id: string, payload: Partial<IBlog>) => {
   return result;
 };
 
+ const deleteBlogFromDB = async (id: string) => {
+  const result = await Blog.findOneAndDelete({_id: id});
+
+  return result;
+ }
+
 const getAllBlogsFromDB = async () => {
   const result = await Blog.find().populate('author');
   return result;
@@ -22,5 +28,6 @@ const getAllBlogsFromDB = async () => {
 export const BlogServices = {
   createBlogIntoDB,
   getAllBlogsFromDB,
-  updateBlogFromDB
+  updateBlogFromDB,
+  deleteBlogFromDB
 };

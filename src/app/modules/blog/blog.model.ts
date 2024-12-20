@@ -1,7 +1,7 @@
 import mongoose, { Schema, model } from 'mongoose';
 import { IBlog } from './blog.interface';
 
-const blogSchema: Schema = new Schema(
+const blogSchema: Schema = new Schema<IBlog>(
   {
     title: { type: String, required: true },
     content: { type: String, required: true },
