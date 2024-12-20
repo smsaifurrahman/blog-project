@@ -14,14 +14,67 @@ const updateBlogFromDB = async (id: string, payload: Partial<IBlog>) => {
   return result;
 };
 
- const deleteBlogFromDB = async (id: string) => {
-  const result = await Blog.findOneAndDelete({_id: id});
+const deleteBlogFromDB = async (id: string) => {
+  const result = await Blog.findOneAndDelete({ _id: id });
 
   return result;
- }
+};
 
-const getAllBlogsFromDB = async () => {
-  const result = await Blog.find().populate('author');
+const getAllBlogsFromDB = async (query: Record<string, unknown>) => {
+  console.log('Base Query', query);
+  const queryObj = { ...query };
+
+  const searchableFields = ['title', 'content'];
+  let searchTerm = '';
+  if (query?.search) {
+    searchTerm = query?.search as string;
+  }
+
+  // Searching
+  const searchQuery = Blog.find({
+    $or: searchableFields.map((field) => ({
+      [field]: { $regex: searchTerm, $options: 'i' },
+    })),
+  });
+
+  // // excludes fields
+  // const excludeFields = ['search', 'sortBy'];
+  // excludeFields.forEach((el) => delete queryObj[el]);
+  // console.log('Query Object', queryObj);
+
+  let sortBy = 'createdAt';
+  if (query?.sortBy) {
+    sortBy = query?.sortBy as string;
+  }
+
+  // sort Query
+  const sortQuery = searchQuery.sort(sortBy);
+
+  // sort Order
+
+  // let sortOrder = 'asc';
+  if (query?.sortOrder && query?.sortOrder === 'asc') {
+    sortBy = `${query?.sortBy}`;
+  } else if (query?.sortOrder && query?.sortOrder === 'desc'){
+    sortBy = `-${query?.sortBy}`;
+  }
+
+  // const sortOrderQuery 
+  const sortOrderQuery =  sortQuery.sort(sortBy);
+
+  // filter
+
+  let filteredQuery = sortOrderQuery;
+  if(query?.filter) {
+   const  filter = query?.filter as string;
+   filteredQuery = sortOrderQuery.find({author: filter})
+
+  }
+
+  
+
+  const result = await filteredQuery.populate('author');
+
   return result;
 };
 
@@ -29,5 +82,5 @@ export const BlogServices = {
   createBlogIntoDB,
   getAllBlogsFromDB,
   updateBlogFromDB,
-  deleteBlogFromDB
+  deleteBlogFromDB,
 };

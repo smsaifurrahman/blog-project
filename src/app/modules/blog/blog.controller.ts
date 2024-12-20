@@ -93,7 +93,8 @@ const deleteBlog: RequestHandler = catchAsync(async (req, res) => {
 });
 
 const getAllBlogs: RequestHandler = catchAsync(async (req, res) => {
-  const result = await BlogServices.getAllBlogsFromDB();
+  const query = req.query;
+  const result = await BlogServices.getAllBlogsFromDB(query);
   sendResponse(res, {
     statusCode: HttpStatus.OK,
     success: true,
