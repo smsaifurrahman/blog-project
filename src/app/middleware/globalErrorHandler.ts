@@ -1,5 +1,5 @@
 import { ErrorRequestHandler } from 'express';
-import { ZodError,  } from 'zod';
+import { ZodError } from 'zod';
 
 import config from '../config';
 import handleZodError from '../errors/handleZodError';
@@ -8,8 +8,7 @@ import handleCastError from '../errors/handleCastError';
 import handleDuplicateError from '../errors/handleDuplicationError';
 import { TErrorSources } from '../interface/error';
 import AppError from '../errors/AppError';
-
-
+import handleTokenError from '../errors/handleTokenError';
 
 const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
   let statusCode = 500;
@@ -43,7 +42,17 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
     message = simplifiedError?.message;
     error = simplifiedError?.errorSources;
   }
-   else if (err instanceof AppError) {
+   else if (
+    err.name === 'JsonWebTokenError' ||
+    err.name === 'TokenExpiredError'
+  ) {
+    const simplifiedError = handleTokenError(err);
+    statusCode = simplifiedError?.statusCode;
+    message = simplifiedError?.message;
+    error = simplifiedError?.errorSources;
+  }
+  
+  else if (err instanceof AppError) {
     statusCode = err?.statusCode;
     message = err?.message;
     error = [
@@ -52,9 +61,10 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
         message: err?.message,
       },
     ];
-  } 
-  else if (err instanceof Error) {
+  } else if (err instanceof Error) {
+    console.log(err);
     message = err?.message;
+
     error = [
       {
         path: '',
