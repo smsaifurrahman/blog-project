@@ -12,9 +12,9 @@ const auth = (...requireRoles: TUserRole[]) => {
   return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const tokenBearer = req.headers.authorization;
     const token = tokenBearer?.split(' ')[1];
-    const blog = req.body;
+ 
 
-    console.log(token);
+
 
     // check if the token is sent from client
     if (!token) {
@@ -26,7 +26,7 @@ const auth = (...requireRoles: TUserRole[]) => {
       config.jwt_access_secret as string,
     ) as JwtPayload;
 
-    console.log(decoded);
+
 
     const { role, userEmail } = decoded;
 

@@ -9,6 +9,8 @@ import { addAuthorInfo } from '../../middleware/addAuthor';
 
 const router = express.Router();
 
-router.post('/', auth('user'), addAuthorInfo(), validateRequest(BlogValidations.createBlogValidationSchema), BlogControllers.createBlog)
+router.post('/', auth('user'), addAuthorInfo(), validateRequest(BlogValidations.createBlogValidationSchema), BlogControllers.createBlog);
+router.get('/', BlogControllers.getAllBlogs);
+router.patch('/:blogId', auth('user'), BlogControllers.updateBlog)
 
 export const BlogRoutes = router

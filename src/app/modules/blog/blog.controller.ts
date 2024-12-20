@@ -2,9 +2,14 @@ import { RequestHandler } from 'express';
 import catchAsync from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
 import { BlogServices } from './blog.service';
+import { HttpStatus } from 'http-status-ts';
+import jwt, { JwtPayload } from 'jsonwebtoken';
+import config from '../../config';
+import Blog from './blog.model';
+import { User } from '../user/user.model';
+import AppError from '../../errors/AppError';
 
-
-const createBlog: RequestHandler = catchAsync(async (req, res, next) => {
+const createBlog: RequestHandler = catchAsync(async (req, res) => {
   const userData = req.body;
   const result = await BlogServices.createBlogIntoDB(userData);
 
@@ -12,7 +17,7 @@ const createBlog: RequestHandler = catchAsync(async (req, res, next) => {
     statusCode: 201,
     success: true,
     message: 'Blog is created successfully',
-    data: result
+    data: result,
     //  {
     //   _id: result._id,
     //   name: result.name,
@@ -22,7 +27,46 @@ const createBlog: RequestHandler = catchAsync(async (req, res, next) => {
   });
 });
 
+const updateBlog: RequestHandler = catchAsync(async (req, res) => {
+  const { blogId } = req.params;
+  const tokenBearer = req.headers.authorization;
+  const token = tokenBearer?.split(' ')[1];
+  const decoded = jwt.verify(
+    token as string,
+    config.jwt_access_secret as string,
+  ) as JwtPayload;
+
+  const tokenEmail = decoded.userEmail;
+  const blogAuthorId = await Blog.findById(blogId);
+  const authorId = blogAuthorId?.author;
+  const authorInfo = await User.findById({ _id: authorId });
+ // checking whether token email matches with blog author email
+  if (tokenEmail !== authorInfo?.email) {
+    throw new AppError(HttpStatus.UNAUTHORIZED, 'You are not Authorized');
+  }
+
+  const result = await BlogServices.updateBlogFromDB(blogId, req.body);
+
+  sendResponse(res, {
+    statusCode: HttpStatus.OK,
+    success: true,
+    message: 'Blog  is updated successfully',
+    data: result,
+  });
+});
+
+const getAllBlogs: RequestHandler = catchAsync(async (req, res) => {
+  const result = await BlogServices.getAllBlogsFromDB();
+  sendResponse(res, {
+    statusCode: HttpStatus.OK,
+    success: true,
+    message: 'Blogs are retrieved successfully',
+    data: result,
+  });
+});
 
 export const BlogControllers = {
-    createBlog
-}
+  createBlog,
+  getAllBlogs,
+  updateBlog,
+};
