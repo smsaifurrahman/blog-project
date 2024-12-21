@@ -6,16 +6,15 @@ import { HttpStatus } from 'http-status-ts';
 
 const blockUser: RequestHandler = catchAsync(async (req, res) => {
   const { userId } = req.params;
-  const result = await AdminServices.blockUserIntoDB(userId);
+  await AdminServices.blockUserIntoDB(userId);
 
   sendResponse(res, {
     statusCode: HttpStatus.OK,
     success: true,
-    message: 'User is blocked',
+    message: 'User blocked Successfully',
   });
 });
 
-
 export const AdminController = {
-    blockUser
-}
+  blockUser,
+};

@@ -3,8 +3,7 @@ import catchAsync from '../../utils/catchAsync';
 import { UserServices } from './user.service';
 import sendResponse from '../../utils/sendResponse';
 
-
-const createUser: RequestHandler = catchAsync(async (req, res, next) => {
+const createUser: RequestHandler = catchAsync(async (req, res) => {
   const userData = req.body;
 
   const result = await UserServices.createUserIntoDB(userData);
@@ -13,17 +12,14 @@ const createUser: RequestHandler = catchAsync(async (req, res, next) => {
     statusCode: 201,
     success: true,
     message: 'User registered successfully',
-    data: result
-    //  {
-    //   _id: result._id,
-    //   name: result.name,
-    //   email: result.email,
-
-    // },
+    data: {
+      _id: result._id,
+      name: result.name,
+      email: result.email,
+    },
   });
 });
 
-
 export const UserControllers = {
-    createUser
-}
+  createUser,
+};

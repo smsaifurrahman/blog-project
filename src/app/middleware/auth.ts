@@ -12,9 +12,6 @@ const auth = (...requireRoles: TUserRole[]) => {
   return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const tokenBearer = req.headers.authorization;
     const token = tokenBearer?.split(' ')[1];
- 
-
-
 
     // check if the token is sent from client
     if (!token) {
@@ -26,10 +23,7 @@ const auth = (...requireRoles: TUserRole[]) => {
       config.jwt_access_secret as string,
     ) as JwtPayload;
 
-
-
     const { role, userEmail } = decoded;
-
 
     // checking if the user exists!
     const user = await User.isUserExitsByEmail(userEmail);
@@ -39,14 +33,14 @@ const auth = (...requireRoles: TUserRole[]) => {
     }
 
     // checking if the User is blocked
-    if (!(await User.isUserBlocked(user.isBlocked))) {
-      throw new AppError(HttpStatus.BAD_REQUEST, 'User is blocked');
+
+    if (await User.isUserBlocked(user.email)) {
+      throw new AppError(HttpStatus.UNAUTHORIZED, 'User is blocked');
     }
 
     if (requireRoles && !requireRoles.includes(role)) {
       throw new AppError(HttpStatus.UNAUTHORIZED, 'You are not authorized');
     }
-
 
     next();
   });

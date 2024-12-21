@@ -1,3 +1,4 @@
+import { User } from './../modules/user/user.model';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 import catchAsync from '../utils/catchAsync';
@@ -14,9 +15,9 @@ export const addAuthorInfo = () => {
     ) as JwtPayload;
 
     // console.log(decoded);
-    const { _id } = await User.findOne({ email: decoded.userEmail });
+    const user = await User.findOne({ email: decoded.userEmail });
 
-    const author = _id;
+    const author = user?._id;
     req.body.author = author;
     
 

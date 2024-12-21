@@ -13,6 +13,6 @@ router.post('/', auth('user'), addAuthorInfo(), validateRequest(BlogValidations.
 router.get('/', BlogControllers.getAllBlogs);
 router.patch('/:blogId', auth('user'), validateRequest(BlogValidations.updateBlogValidationSchema), BlogControllers.updateBlog);
 
-router.delete('/:id', auth('admin', 'user'), BlogControllers.deleteBlog )
+router.delete('/:blogId', auth('admin', 'user'), BlogControllers.deleteBlog )
 
 export const BlogRoutes = router

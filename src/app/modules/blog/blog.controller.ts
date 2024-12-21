@@ -16,14 +16,13 @@ const createBlog: RequestHandler = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: 201,
     success: true,
-    message: 'Blog is created successfully',
-    data: result,
-    //  {
-    //   _id: result._id,
-    //   name: result.name,
-    //   email: result.email,
-
-    // },
+    message: 'Blog created successfully',
+    data: {
+      _id: result._id,
+      name: result.title,
+      email: result.content,
+      author: result.author,
+    },
   });
 });
 
@@ -50,13 +49,19 @@ const updateBlog: RequestHandler = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: HttpStatus.OK,
     success: true,
-    message: 'Blog  is updated successfully',
-    data: result,
+    message: 'Blog updated successfully',
+    data: {
+      _id: result?._id,
+      name: result?.title,
+      email: result?.content,
+      author: result?.author,
+    },
   });
 });
 
 const deleteBlog: RequestHandler = catchAsync(async (req, res) => {
   const { blogId } = req.params;
+
   const tokenBearer = req.headers.authorization;
   const token = tokenBearer?.split(' ')[1];
   const decoded = jwt.verify(
@@ -66,6 +71,7 @@ const deleteBlog: RequestHandler = catchAsync(async (req, res) => {
 
   const { userEmail, role } = decoded;
   const blog = await Blog.findById(blogId);
+
   if (!blog) {
     throw new AppError(HttpStatus.NOT_FOUND, 'Blog not found');
   }
@@ -80,15 +86,13 @@ const deleteBlog: RequestHandler = catchAsync(async (req, res) => {
     );
   }
 
-  const result = await BlogServices.deleteBlogFromDB(blogId);
+  await BlogServices.deleteBlogFromDB(blogId);
 
   sendResponse(res, {
     // statusCode: HttpStatus.OK,
     success: true,
-    message: 'Blog is deleted successfully',
+    message: 'Blog deleted successfully',
     statusCode: HttpStatus.OK,
-    data: result
-  
   });
 });
 

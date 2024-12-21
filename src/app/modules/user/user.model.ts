@@ -18,7 +18,7 @@ const userSchema = new Schema<IUser>(
     password: {
       type: String,
       required: true,
-      select: false
+      select: false,
     },
     role: {
       type: String,
@@ -36,12 +36,12 @@ const userSchema = new Schema<IUser>(
 );
 
 userSchema.pre('save', async function (next) {
-  console.log(this, 'pre hook: we will save the data');
   // hashing password and save into db
-  const user = this;
 
-  user.password = await bcrypt.hash(
-    user.password,
+  // const user = this;
+
+  this.password = await bcrypt.hash(
+    this.password,
     Number(config.bcrypt_salt_rounds),
   );
 
@@ -52,12 +52,15 @@ userSchema.statics.isUserExitsByEmail = async function (email: string) {
   return await User.findOne({ email }).select('+password');
 };
 
-userSchema.statics.isUserBlocked = async function (isBlocked: boolean) {
-  return await User.findOne({ isBlocked });
+userSchema.statics.isUserBlocked = async function (email: string) {
+  const user = await User.findOne({ email: email }, { isBlocked: 1 });
+  return user?.isBlocked || false;
 };
 
-userSchema.statics.isPasswordMatched = async function (  plainTextPassword,
-  hashedPassword,) {
+userSchema.statics.isPasswordMatched = async function (
+  plainTextPassword,
+  hashedPassword,
+) {
   return await bcrypt.compare(plainTextPassword, hashedPassword);
 };
 

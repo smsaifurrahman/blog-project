@@ -1,8 +1,9 @@
 
-import  {  NextFunction, Request, Response } from 'express';
+import  {   Request, Response } from 'express';
 import { HttpStatus } from 'http-status-ts';
 
-const notFound =  (req: Request, res: Response, next: NextFunction) =>{
+
+const notFound =  (req: Request, res: Response) =>{
 
 
     res.status(HttpStatus.NOT_FOUND).json({

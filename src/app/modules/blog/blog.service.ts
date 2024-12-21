@@ -22,7 +22,6 @@ const deleteBlogFromDB = async (id: string) => {
 
 const getAllBlogsFromDB = async (query: Record<string, unknown>) => {
   console.log('Base Query', query);
-  const queryObj = { ...query };
 
   const searchableFields = ['title', 'content'];
   let searchTerm = '';
@@ -37,11 +36,6 @@ const getAllBlogsFromDB = async (query: Record<string, unknown>) => {
     })),
   });
 
-  // // excludes fields
-  // const excludeFields = ['search', 'sortBy'];
-  // excludeFields.forEach((el) => delete queryObj[el]);
-  // console.log('Query Object', queryObj);
-
   let sortBy = 'createdAt';
   if (query?.sortBy) {
     sortBy = query?.sortBy as string;
@@ -55,23 +49,20 @@ const getAllBlogsFromDB = async (query: Record<string, unknown>) => {
   // let sortOrder = 'asc';
   if (query?.sortOrder && query?.sortOrder === 'asc') {
     sortBy = `${query?.sortBy}`;
-  } else if (query?.sortOrder && query?.sortOrder === 'desc'){
+  } else if (query?.sortOrder && query?.sortOrder === 'desc') {
     sortBy = `-${query?.sortBy}`;
   }
 
-  // const sortOrderQuery 
-  const sortOrderQuery =  sortQuery.sort(sortBy);
+  // const sortOrderQuery
+  const sortOrderQuery = sortQuery.sort(sortBy);
 
   // filter
 
   let filteredQuery = sortOrderQuery;
-  if(query?.filter) {
-   const  filter = query?.filter as string;
-   filteredQuery = sortOrderQuery.find({author: filter})
-
+  if (query?.filter) {
+    const filter = query?.filter as string;
+    filteredQuery = sortOrderQuery.find({ author: filter });
   }
-
-  
 
   const result = await filteredQuery.populate('author');
 
