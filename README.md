@@ -4,6 +4,24 @@ This project is a backend application for a blogging platform. It allows users t
 
 ---
 
+### How to run the project
+## 1. Clone the repository
+  git clone https://github.com/yourusername/blogging-platform-backend.git
+  cd blog-project
+## 2. Install dependencies: 
+  npm install
+
+## 3. Set up environment variables in a .env file:
+ MONGO_URI=<your_mongodb_connection_string>
+ JWT_SECRET=<your_jwt_secret_key>
+ PORT=5000
+## 4. Start the server:
+ npm run dev
+
+ ## 5. Access the API at http://localhost:5000
+
+
+
 ## Features
 
 ### User Roles
@@ -80,3 +98,55 @@ This project is a backend application for a blogging platform. It allows users t
     "email": "john.doe@example.com",
     "password": "password123"
   }
+#### Login User
+- **Endpoint**: `POST /api/auth/login`
+- **Description**: Authenticates a user with their email and password and generates a JWT token.
+- **Request Body**:
+  ```json
+  {
+    "email": "john.doe@example.com",
+    "password": "password123"
+  }
+#### Create Blog
+- **Endpoint**: `POST /api/blogs`
+- **Description**: Allows a logged-in user to create a blog by providing a title and content.
+- **Request Body**:
+  ```json
+  {
+    "title": "My First Blog",
+    "content": "This is the content of my first blog."
+  }
+#### Update Blog
+- **Endpoint**: `PATCH /api/blogs/:id`
+- **Description**: Allows a logged-in user to update their own blog by its ID.
+- **Request Body**:
+  ```json
+  {
+    "title": "Updated Blog Title",
+    "content": "This is the updated content of my blog."
+  }
+#### Delete Blog
+- **Endpoint**: `DELETE /api/blogs/:id`
+- **Description**: Allows a logged-in user to delete their own blog by its ID.
+
+---
+#### Get All Blogs (Public)
+- **Endpoint**: `GET /api/blogs`
+- **Description**: Provides a public API to fetch all blogs with options for searching, sorting, and filtering.
+- **Query Parameters**:
+  - **`search`**: Search blogs by title or content (e.g., `search=blogtitle`).
+  - **`sortBy`**: Sort blogs by specific fields such as `createdAt` or `title` (e.g., `sortBy=title`).
+  - **`sortOrder`**: Defines the sorting order. Accepts values `asc` (ascending) or `desc` (descending) (e.g., `sortOrder=desc`).
+  - **`filter`**: Filter blogs by author ID (e.g., `author=authorId`).
+
+---
+#### Block User
+- **Endpoint**: `PATCH /api/admin/users/:userId/block`
+- **Description**: Allows an admin to block a user by updating the `isBlocked` property to `true`.
+
+---
+#### Delete Blog (Admin)
+- **Endpoint**: `DELETE /api/admin/blogs/:id`
+- **Description**: Allows an admin to delete any blog by its ID.
+
+---
